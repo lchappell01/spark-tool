@@ -7,69 +7,47 @@
   <style>
     body { margin: 0; padding: 1rem; font-family: Arial, sans-serif; background: #ffffff; color: #1a1a1a; }
     .sp-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; padding: 1rem 0; }
-    .sp-card { width: 100%; max-width: 640px; background: #ffffff; border: 0.5px solid rgba(0,0,0,0.15); border-radius: 8px; padding: 16px 20px; box-sizing: border-box; }
-    .sp-card-title { font-size: 13px; font-weight: 500; color: #1a1a1a; margin: 0 0 4px; }
-    .sp-card-sub { font-size: 12px; color: #555; margin: 0 0 12px; line-height: 1.6; }
-    .ci-row { display: flex; align-items: center; gap: 10px; }
-    .ci-row label { font-size: 12px; color: #555; width: 172px; flex-shrink: 0; }
-    .ci-row input[type=range] { flex: 1; }
-    .ci-val { font-size: 13px; font-weight: 500; min-width: 40px; text-align: right; color: #1a1a1a; }
-    .ci-val span.vis-max { font-size: 11px; color: #777; font-weight: 400; }
     .summary-card { width: 100%; max-width: 640px; background: #f5f5f3; border: 0.5px solid rgba(0,0,0,0.15); border-radius: 12px; padding: 16px 20px; box-sizing: border-box; }
     .summary-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .summary-avg { font-size: 22px; font-weight: 500; color: #1a1a1a; }
-    .summary-avg-label { font-size: 12px; color: #555; }
-    .summary-msg { font-size: 12px; color: #555; line-height: 1.6; margin: 0 0 12px; }
-    .reset-btn { font-size: 12px; padding: 6px 14px; cursor: pointer; color: #555; background: transparent; border: 0.5px solid rgba(0,0,0,0.3); border-radius: 8px; }
-    .reset-btn:hover { background: #ffffff; }
-    .reset-btn:focus-visible { outline: 2px solid #1a7abf; outline-offset: 2px; }
+    .summary-avg-label { font-size: 12px; color: #555555; }
+    .summary-msg { font-size: 12px; color: #555555; line-height: 1.6; margin: 0 0 12px; }
+    .sp-reset-btn { font-size: 12px; padding: 6px 14px; cursor: pointer; color: #555555; background: transparent; border: 1px solid rgba(0,0,0,0.3); border-radius: 8px; }
+    .sp-reset-btn:hover { background: #ffffff; }
+    .sp-reset-btn:focus-visible { outline: 2px solid #1a7abf; outline-offset: 2px; }
     .scores-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .scores-table th { text-align: left; font-weight: 500; color: #555; padding: 4px 0; border-bottom: 0.5px solid rgba(0,0,0,0.15); }
+    .scores-table th { text-align: left; font-weight: 500; color: #555555; padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.12); }
     .scores-table th.th-score { text-align: right; width: 52px; }
     .scores-table th.th-slider { padding-left: 12px; }
-    .scores-table td { padding: 9px 0; border-bottom: 0.5px solid rgba(0,0,0,0.15); vertical-align: middle; }
+    .scores-table td { padding: 9px 0; border-bottom: 1px solid rgba(0,0,0,0.12); vertical-align: middle; }
     .scores-table tr:last-child td { border-bottom: none; }
     .td-name { width: 185px; padding-right: 10px; color: #1a1a1a; font-size: 12px; line-height: 1.4; }
     .td-slider { padding-left: 12px; }
     .td-score { width: 52px; text-align: right; font-weight: 500; color: #1a1a1a; font-size: 13px; padding-left: 10px; }
-    .styled-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 20px; border-radius: 10px; outline: none; cursor: pointer; border: none; }
-    .styled-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; border-radius: 50%; background: var(--thumb-color, #888); border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--thumb-color, #888); cursor: pointer; }
-    .styled-slider::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--thumb-color, #888); border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--thumb-color, #888); cursor: pointer; }
-    .styled-slider:focus-visible { outline: 2px solid #1a7abf; outline-offset: 3px; border-radius: 10px; }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-    .section-head { font-size: 11px; font-weight: 500; color: #777; text-transform: uppercase; letter-spacing: 0.06em; width: 100%; max-width: 640px; margin-bottom: -6px; }
+    .sp-styled-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 20px; border-radius: 10px; outline: none; cursor: pointer; border: none; }
+    .sp-styled-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; border-radius: 50%; background: var(--sp-thumb, #888888); border: 3px solid #ffffff; box-shadow: 0 0 0 1.5px var(--sp-thumb, #888888); cursor: pointer; }
+    .sp-styled-slider::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--sp-thumb, #888888); border: 3px solid #ffffff; box-shadow: 0 0 0 1.5px var(--sp-thumb, #888888); cursor: pointer; }
+    .sp-styled-slider:focus-visible { outline: 2px solid #1a7abf; outline-offset: 3px; border-radius: 10px; }
+    .sp-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .sp-section-head { font-size: 11px; font-weight: 500; color: #777777; text-transform: uppercase; letter-spacing: 0.06em; width: 100%; max-width: 640px; margin-bottom: -6px; }
   </style>
 </head>
 <body>
 
 <div class="sp-wrap" role="main">
-  <h1 class="sr-only">SPARK self-care self-assessment tool</h1>
+  <h1 class="sp-sr-only">SPARK self-care self-assessment tool</h1>
 
-  <div class="sp-card" role="group" aria-labelledby="checkin-heading">
-    <p class="sp-card-title" id="checkin-heading">Checking in first</p>
-    <p class="sp-card-sub" id="checkin-desc">On a scale of 1 to 10, where 1 means exhausted, tired and stressed, and 10 means energised, healthy and not stressed — where are you right now?</p>
-    <div class="ci-row">
-      <label for="ci-range">Overall wellbeing right now</label>
-      <input type="range" id="ci-range" min="1" max="10" step="1" value="5"
-        aria-describedby="checkin-desc"
-        aria-valuemin="1" aria-valuemax="10" aria-valuenow="5"
-        aria-valuetext="5 out of 10"
-        oninput="updateCheckin(this)">
-      <span class="ci-val" aria-hidden="true"><span id="ci-val">5</span><span class="vis-max"> / 10</span></span>
-    </div>
-  </div>
+  <p class="sp-section-head" aria-hidden="true">Rate your self-care in each domain (1 = weak, 10 = strong)</p>
 
-  <p class="section-head" aria-hidden="true">Rate your self-care in each domain (1 = weak, 10 = strong)</p>
-
-  <div class="summary-card" role="region" aria-labelledby="summary-heading">
+  <div class="summary-card" role="region" aria-labelledby="sp-summary-heading">
     <div class="summary-top">
       <div>
-        <div class="summary-avg-label" id="summary-heading">Overall average</div>
-        <div class="summary-avg" id="avg-out" aria-label="Overall average score: 5.0 out of 10">5.0</div>
+        <div class="summary-avg-label" id="sp-summary-heading">Overall average</div>
+        <div class="summary-avg" id="sp-avg-out" aria-label="Overall average score: 5.0 out of 10">5.0</div>
       </div>
-      <button class="reset-btn" onclick="resetAll()" aria-label="Reset all domain scores to 5">Reset</button>
+      <button class="sp-reset-btn" onclick="spResetAll()" aria-label="Reset all domain scores to 5">Reset</button>
     </div>
-    <p class="summary-msg" id="sum-msg" role="status" aria-live="polite">Adjust the sliders below to see your self-care profile.</p>
+    <p class="summary-msg" id="sp-sum-msg" role="status" aria-live="polite">Adjust the sliders below to see your self-care profile.</p>
 
     <table class="scores-table" aria-label="Self-care domain ratings">
       <thead>
@@ -79,123 +57,101 @@
           <th scope="col" class="th-score">Score</th>
         </tr>
       </thead>
-      <tbody id="scores-tbody"></tbody>
+      <tbody id="sp-scores-tbody"></tbody>
     </table>
   </div>
 </div>
 
 <script>
-const domains = [
-  { label: "Work (support & environment)", color: "#e97c61" },
-  { label: "Work (conditions)",            color: "#ee8959" },
-  { label: "Sleep",                        color: "#f4a261" },
-  { label: "Technology",                   color: "#efb366" },
-  { label: "Emotional / Psychological",    color: "#e9c46a" },
-  { label: "Support Networks",             color: "#8ab17d" },
-  { label: "Physical & Mental Health",     color: "#2a9d8f" },
-  { label: "Spirituality",                 color: "#287271" },
-  { label: "Leisure & Relaxation",         color: "#264653" },
-  { label: "Compassion & Kindness",        color: "#985277" },
-];
+(function() {
+  var spDomains = [
+    { label: "Work (support & environment)", color: "#e97c61" },
+    { label: "Work (conditions)",            color: "#ee8959" },
+    { label: "Sleep",                        color: "#f4a261" },
+    { label: "Technology",                   color: "#efb366" },
+    { label: "Emotional / Psychological",    color: "#e9c46a" },
+    { label: "Support Networks",             color: "#8ab17d" },
+    { label: "Physical & Mental Health",     color: "#2a9d8f" },
+    { label: "Spirituality",                 color: "#287271" },
+    { label: "Leisure & Relaxation",         color: "#264653" },
+    { label: "Compassion & Kindness",        color: "#985277" },
+  ];
 
-const N = domains.length;
-const values = new Array(N).fill(5);
-const tbody = document.getElementById('scores-tbody');
+  var N = spDomains.length;
+  var spValues = new Array(N).fill(5);
+  var tbody = document.getElementById('sp-scores-tbody');
 
-function hexToRgb(hex) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
-  return [r,g,b];
-}
+  function hexToRgb(hex) {
+    return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
+  }
 
-function trackBg(color, pct) {
-  const [r,g,b] = hexToRgb(color);
-  const lightR = Math.round(r + (240-r)*0.7);
-  const lightG = Math.round(g + (240-g)*0.7);
-  const lightB = Math.round(b + (240-b)*0.7);
-  const light = 'rgb('+lightR+','+lightG+','+lightB+')';
-  return 'linear-gradient(to right, '+color+' 0%, '+color+' '+pct+'%, '+light+' '+pct+'%, '+light+' 100%)';
-}
+  function trackBg(color, pct) {
+    var rgb = hexToRgb(color);
+    var light = 'rgb('+Math.round(rgb[0]+(240-rgb[0])*0.7)+','+Math.round(rgb[1]+(240-rgb[1])*0.7)+','+Math.round(rgb[2]+(240-rgb[2])*0.7)+')';
+    return 'linear-gradient(to right,'+color+' 0%,'+color+' '+pct+'%,'+light+' '+pct+'%,'+light+' 100%)';
+  }
 
-domains.forEach((d, i) => {
-  const sliderId = 'slider-' + i;
-  const scoreId  = 'score-' + i;
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td class="td-name">${d.label}</td>
-    <td class="td-slider">
-      <input
-        class="styled-slider"
-        type="range"
-        id="${sliderId}"
-        min="1" max="10" step="1" value="5"
-        data-i="${i}"
-        aria-label="${d.label} self-care rating"
-        aria-valuemin="1" aria-valuemax="10" aria-valuenow="5"
-        aria-valuetext="5 out of 10 — ${d.label}"
-        style="--thumb-color:${d.color};"
-        oninput="onSlide(this)">
-    </td>
-    <td class="td-score">
-      <span id="${scoreId}" aria-label="${d.label}: 5 out of 10">5<span style="font-size:10px;font-weight:400;color:#777;"> /10</span></span>
-    </td>`;
-  tbody.appendChild(tr);
-  const slider = tr.querySelector('.styled-slider');
-  slider.style.background = trackBg(d.color, 50);
-});
-
-function onSlide(el) {
-  const i   = parseInt(el.dataset.i);
-  const v   = parseInt(el.value);
-  const pct = (v - 1) / 9 * 100;
-  values[i] = v;
-  el.setAttribute('aria-valuenow', v);
-  el.setAttribute('aria-valuetext', v + ' out of 10 — ' + domains[i].label);
-  el.style.background = trackBg(domains[i].color, pct);
-  const scoreEl = document.getElementById('score-' + i);
-  scoreEl.innerHTML = v + '<span style="font-size:10px;font-weight:400;color:#777;"> /10</span>';
-  scoreEl.setAttribute('aria-label', domains[i].label + ': ' + v + ' out of 10');
-  updateSummary();
-}
-
-function updateCheckin(el) {
-  el.setAttribute('aria-valuenow', el.value);
-  el.setAttribute('aria-valuetext', el.value + ' out of 10');
-  document.getElementById('ci-val').textContent = el.value;
-}
-
-function updateSummary() {
-  const avg = values.reduce((a,b) => a+b, 0) / N;
-  const rounded = avg.toFixed(1);
-  const avgEl = document.getElementById('avg-out');
-  avgEl.textContent = rounded;
-  avgEl.setAttribute('aria-label', 'Overall average score: ' + rounded + ' out of 10');
-  document.getElementById('sum-msg').textContent = avg < 4
-    ? "Your ratings suggest you may be running low. Small, consistent steps make a real difference."
-    : avg < 7
-    ? "You are managing in several areas. Notice where your energy goes and where support might help."
-    : "Strong overall self-care. Keep nurturing the areas that sustain you.";
-}
-
-function resetAll() {
-  values.fill(5);
-  domains.forEach((d, i) => {
-    const el = document.getElementById('slider-' + i);
-    el.value = 5;
-    el.setAttribute('aria-valuenow', 5);
-    el.setAttribute('aria-valuetext', '5 out of 10 — ' + d.label);
-    el.style.background = trackBg(d.color, 50);
-    const scoreEl = document.getElementById('score-' + i);
-    scoreEl.innerHTML = '5<span style="font-size:10px;font-weight:400;color:#777;"> /10</span>';
-    scoreEl.setAttribute('aria-label', d.label + ': 5 out of 10');
+  spDomains.forEach(function(d, i) {
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="td-name">'+d.label+'</td>'+
+      '<td class="td-slider">'+
+        '<input class="sp-styled-slider" type="range" id="sp-slider-'+i+'" min="1" max="10" step="1" value="5" data-i="'+i+'"'+
+        ' aria-label="'+d.label+' self-care rating"'+
+        ' aria-valuemin="1" aria-valuemax="10" aria-valuenow="5"'+
+        ' aria-valuetext="5 out of 10 \u2014 '+d.label+'"'+
+        ' style="--sp-thumb:'+d.color+';"'+
+        ' oninput="spOnSlide(this)">'+
+      '</td>'+
+      '<td class="td-score"><span id="sp-score-'+i+'" aria-label="'+d.label+': 5 out of 10">5<span style="font-size:10px;font-weight:400;color:#777;"> /10</span></span></td>';
+    tbody.appendChild(tr);
+    document.getElementById('sp-slider-'+i).style.background = trackBg(d.color, 50);
   });
-  document.getElementById('ci-range').value = 5;
-  document.getElementById('ci-val').textContent = '5';
-  updateSummary();
-}
 
-updateSummary();
+  window.spOnSlide = function(el) {
+    var i = parseInt(el.dataset.i);
+    var v = parseInt(el.value);
+    var pct = (v - 1) / 9 * 100;
+    spValues[i] = v;
+    el.setAttribute('aria-valuenow', v);
+    el.setAttribute('aria-valuetext', v+' out of 10 \u2014 '+spDomains[i].label);
+    el.style.background = trackBg(spDomains[i].color, pct);
+    var sc = document.getElementById('sp-score-'+i);
+    sc.innerHTML = v+'<span style="font-size:10px;font-weight:400;color:#777;"> /10</span>';
+    sc.setAttribute('aria-label', spDomains[i].label+': '+v+' out of 10');
+    spUpdateSummary();
+  };
+
+  window.spUpdateSummary = function() {
+    var avg = spValues.reduce(function(a,b){return a+b;},0) / N;
+    var r = avg.toFixed(1);
+    var avgEl = document.getElementById('sp-avg-out');
+    avgEl.textContent = r;
+    avgEl.setAttribute('aria-label', 'Overall average score: '+r+' out of 10');
+    document.getElementById('sp-sum-msg').textContent = avg < 4
+      ? "Your ratings suggest you may be running low. Small, consistent steps make a real difference."
+      : avg < 7
+      ? "You are managing in several areas. Notice where your energy goes and where support might help."
+      : "Strong overall self-care. Keep nurturing the areas that sustain you.";
+  };
+
+  window.spResetAll = function() {
+    spValues.fill(5);
+    spDomains.forEach(function(d, i) {
+      var el = document.getElementById('sp-slider-'+i);
+      el.value = 5;
+      el.setAttribute('aria-valuenow', 5);
+      el.setAttribute('aria-valuetext', '5 out of 10 \u2014 '+d.label);
+      el.style.background = trackBg(d.color, 50);
+      var sc = document.getElementById('sp-score-'+i);
+      sc.innerHTML = '5<span style="font-size:10px;font-weight:400;color:#777;"> /10</span>';
+      sc.setAttribute('aria-label', d.label+': 5 out of 10');
+    });
+    spUpdateSummary();
+  };
+
+  spUpdateSummary();
+})();
 </script>
 
 </body>
