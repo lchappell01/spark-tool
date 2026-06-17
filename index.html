@@ -1,582 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fixed Commitment Calendar</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:Arial,sans-serif;background:#ffffff;color:#1a1a1a;padding:1rem;}
-.page-wrap{max-width:1200px;margin:0 auto;}
-
-/* ── Side-by-side layout ── */
-.page-row{display:flex;gap:14px;align-items:flex-start;}
-
-/* Toolbar sidebar */
-.toolbar-side{
-  width:152px;flex-shrink:0;
-  display:flex;flex-direction:column;gap:8px;
-  position:sticky;top:.75rem;align-self:flex-start;
-}
-.toolbar-side h1{font-size:14px;font-weight:700;color:#0064b1;line-height:1.4;}
-.btn{
-  font-size:12px;padding:7px 10px;border-radius:6px;
-  cursor:pointer;font-weight:500;border:1.5px solid;
-  width:100%;text-align:center;
-}
-.btn-primary{background:#0064b1;color:#fff;border-color:#0064b1;}
-.btn-primary:hover{background:#004f8e;}
-.btn-secondary{background:transparent;color:#555;border-color:rgba(0,0,0,0.25);}
-.btn-secondary:hover{background:#f0f0ec;}
-.btn:focus-visible{outline:2px solid #0064b1;outline-offset:2px;}
-.help-text{font-size:10px;color:#757575;line-height:1.6;margin-top:2px;}
-
-/* Calendar column */
-.calendar-col{flex:1;min-width:0;}
-
-/* Selection status bar */
-.sel-bar{
-  background:#EFF6FF;border:1px solid #93C5FD;border-radius:6px;
-  padding:6px 10px;margin-bottom:6px;
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-}
-.sel-bar-msg{font-size:11px;color:#1a1a1a;font-weight:500;}
-.sel-bar-hint{font-size:10px;color:#555;white-space:nowrap;}
-
-/* Table */
-.table-scroll{overflow-x:auto;border:1px solid rgba(0,0,0,0.13);border-radius:8px;}
-.cal-table{border-collapse:collapse;width:100%;min-width:620px;}
-.cal-table th,.cal-table td{border:1px solid rgba(0,0,0,0.1);}
-.cal-table thead th{
-  background:#0064b1;color:#fff;font-size:11px;font-weight:600;
-  padding:6px 3px;text-align:center;white-space:nowrap;
-}
-.cal-table thead th:first-child{background:#004f8e;min-width:66px;width:66px;}
-.time-cell{
-  font-size:10px;color:#555;font-weight:500;
-  padding:0 5px;text-align:right;white-space:nowrap;
-  background:#f8f8f8;width:66px;
-}
-
-/* Cell buttons */
-.cal-btn{
-  position:relative;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  width:100%;min-height:34px;padding:2px 3px;
-  background:transparent;border:none;cursor:pointer;
-  font-size:10px;font-family:Arial,sans-serif;color:#1a1a1a;
-  text-align:center;gap:1px;line-height:1.3;
-  -webkit-user-select:none;user-select:none;
-}
-.cal-btn:focus-visible{outline:3px solid #0064b1;outline-offset:-2px;z-index:3;}
-.cal-btn.empty{color:#ccc;}
-.cal-btn.empty:hover{background:#f0f6fc;color:#0064b1;}
-.cal-btn.filled:hover{filter:brightness(0.93);}
-.cell-label{
-  font-weight:700;font-size:10px;max-width:96%;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  display:block;position:relative;z-index:2;
-}
-.cell-cat{
-  font-size:9px;font-weight:400;max-width:96%;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  display:block;opacity:.7;position:relative;z-index:2;
-}
-.cal-btn.cc-sel::before{
-  content:'';position:absolute;inset:0;
-  background:rgba(0,100,177,0.18);border:2px solid #0064b1;
-  pointer-events:none;z-index:1;
-}
-
-/* ── Summary section ── */
-.summary-section{
-  margin-top:1rem;padding:16px 18px;
-  background:#f8f8f8;border:1px solid rgba(0,0,0,0.1);border-radius:10px;
-}
-.summary-heading{
-  font-size:13px;font-weight:700;color:#0064b1;
-  margin-bottom:12px;padding-bottom:8px;
-  border-bottom:1px solid rgba(0,0,0,0.08);
-}
-.sum-cat-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
-  gap:7px;margin-bottom:12px;
-}
-.sum-cat-card{
-  background:#fff;border:1px solid rgba(0,0,0,0.08);
-  border-left:4px solid #ccc;border-radius:7px;
-  padding:9px 11px;display:flex;flex-direction:column;gap:4px;
-}
-.sum-cat-name{font-size:11px;font-weight:600;color:#1a1a1a;line-height:1.3;}
-.sum-cat-hours{font-size:20px;font-weight:700;color:#1a1a1a;line-height:1.1;}
-.sum-cat-label{font-size:9px;color:#757575;margin-top:1px;}
-.sum-study-row{
-  display:grid;grid-template-columns:1fr 1fr;gap:7px;
-  padding-top:12px;border-top:1px solid rgba(0,0,0,0.08);
-}
-.sum-study-card{
-  background:#EFF6FF;border:1px solid #BFDBFE;
-  border-left:4px solid #0064b1;border-radius:7px;
-  padding:12px 14px;display:flex;flex-direction:column;gap:3px;
-}
-.sum-study-name{font-size:11px;font-weight:600;color:#1a1a1a;}
-.sum-study-val{font-size:24px;font-weight:700;color:#0064b1;line-height:1.1;}
-.sum-study-note{font-size:10px;color:#757575;margin-top:2px;}
-
-/* Dialog */
-dialog{
-  border:none;border-radius:10px;padding:0;
-  box-shadow:0 10px 36px rgba(0,0,0,0.2);
-  max-width:360px;width:90%;background:#fff;
-}
-dialog::backdrop{background:rgba(0,0,0,0.45);}
-.dialog-inner{padding:20px;}
-.dialog-title{font-size:14px;font-weight:600;color:#0064b1;margin-bottom:3px;}
-.dialog-context{font-size:12px;color:#757575;margin-bottom:14px;}
-.dialog-field{margin-bottom:12px;}
-.dialog-field label{font-size:12px;font-weight:600;color:#1a1a1a;display:block;margin-bottom:4px;}
-.dialog-field select,.dialog-field input[type=text]{
-  width:100%;font-size:13px;padding:8px 10px;border-radius:6px;
-  border:1.5px solid rgba(0,0,0,0.2);color:#1a1a1a;background:#fff;font-family:Arial,sans-serif;
-}
-.dialog-field select:focus,.dialog-field input:focus{outline:2px solid #0064b1;border-color:#0064b1;}
-.dialog-actions{
-  display:flex;gap:8px;justify-content:flex-end;
-  margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.08);
-}
-.btn-danger{
-  background:transparent;color:#C93E1C;border:1.5px solid #C93E1C;
-  font-size:12px;padding:7px 12px;border-radius:6px;cursor:pointer;font-family:Arial,sans-serif;
-}
-.btn-danger:hover{background:#fff5f3;}
-.btn-danger:focus-visible{outline:2px solid #C93E1C;outline-offset:2px;}
-.btn-dlg{font-size:12px;padding:7px 14px;}
-
-/* Utility */
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
-
-/* Print */
-@media print{
-  .no-print{display:none!important;}
-  .page-row{display:block;}
-  .toolbar-side{display:none;}
-  .print-heading{display:block!important;}
-  body{padding:0;}
-  .page-wrap{max-width:100%;}
-  .table-scroll{border:none;overflow:visible;}
-  .cal-table{font-size:8px;}
-  .cal-btn{min-height:24px;}
-  .cal-table thead th,.cal-btn,.sum-cat-card,.sum-study-card{
-    -webkit-print-color-adjust:exact;print-color-adjust:exact;
-  }
-  .cal-btn.cc-sel::before{display:none;}
-  .summary-section{break-inside:avoid;margin-top:.5rem;}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPARK Self-Care Self-Assessment</title>
+  <style>
+    body { margin: 0; padding: 1rem; font-family: Arial, sans-serif; background: #ffffff; color: #1a1a1a; }
+    .sp-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; padding: 1rem 0; }
+    .summary-card { width: 100%; max-width: 640px; background: #f5f5f3; border: 0.5px solid rgba(0,0,0,0.15); border-radius: 12px; padding: 16px 20px; box-sizing: border-box; }
+    .summary-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .summary-avg { font-size: 22px; font-weight: 500; color: #1a1a1a; }
+    .summary-avg-label { font-size: 12px; color: #555555; }
+    .summary-msg { font-size: 12px; color: #555555; line-height: 1.6; margin: 0 0 12px; }
+    .sp-reset-btn { font-size: 12px; padding: 6px 14px; cursor: pointer; color: #555555; background: transparent; border: 1px solid rgba(0,0,0,0.3); border-radius: 8px; }
+    .sp-reset-btn:hover { background: #ffffff; }
+    .sp-reset-btn:focus-visible { outline: 2px solid #1a7abf; outline-offset: 2px; }
+    .scores-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .scores-table th { text-align: left; font-weight: 500; color: #555555; padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.12); }
+    .scores-table th.th-score { text-align: right; width: 52px; }
+    .scores-table th.th-slider { padding-left: 12px; }
+    .scores-table td { padding: 9px 0; border-bottom: 1px solid rgba(0,0,0,0.12); vertical-align: middle; }
+    .scores-table tr:last-child td { border-bottom: none; }
+    .td-name { width: 185px; padding-right: 10px; color: #1a1a1a; font-size: 12px; line-height: 1.4; }
+    .td-slider { padding-left: 12px; }
+    .td-score { width: 52px; text-align: right; font-weight: 500; color: #1a1a1a; font-size: 13px; padding-left: 10px; }
+    .sp-styled-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 20px; border-radius: 10px; outline: none; cursor: pointer; border: none; }
+    .sp-styled-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; border-radius: 50%; background: var(--sp-thumb, #888888); border: 3px solid #ffffff; box-shadow: 0 0 0 1.5px var(--sp-thumb, #888888); cursor: pointer; }
+    .sp-styled-slider::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--sp-thumb, #888888); border: 3px solid #ffffff; box-shadow: 0 0 0 1.5px var(--sp-thumb, #888888); cursor: pointer; }
+    .sp-styled-slider:focus-visible { outline: 2px solid #1a7abf; outline-offset: 3px; border-radius: 10px; }
+    .sp-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .sp-section-head { font-size: 11px; font-weight: 500; color: #777777; text-transform: uppercase; letter-spacing: 0.06em; width: 100%; max-width: 640px; margin-bottom: -6px; }
+  </style>
 </head>
 <body>
-<div class="page-wrap">
 
-  <h1 class="print-heading" style="display:none;font-size:15px;font-weight:700;margin-bottom:.5rem;color:#0064b1;">
-    Fixed Commitment Calendar
-  </h1>
+<div class="sp-wrap" role="main">
+  <h1 class="sp-sr-only">SPARK self-care self-assessment tool</h1>
 
-  <div class="page-row">
+  <p class="sp-section-head" aria-hidden="true">Rate your self-care in each domain (1 = weak, 10 = strong)</p>
 
-    <!-- Toolbar sidebar -->
-    <aside class="toolbar-side no-print" aria-label="Calendar controls">
-      <h1>Fixed Commitment Calendar</h1>
-      <button class="btn btn-secondary" onclick="ccClearAll()">Clear all</button>
-      <button class="btn btn-primary" onclick="window.print()">Print calendar</button>
-      <p class="help-text">
-        <strong>Mouse:</strong> Click a cell or click &amp; drag to select a range.<br><br>
-        <strong>Keyboard:</strong> Tab to enter &bull; Arrow keys to move &bull; Shift+Arrow to select &bull; Enter to set &bull; Delete to clear &bull; Escape to cancel.
-      </p>
-    </aside>
-
-    <!-- Calendar -->
-    <div class="calendar-col">
-      <div id="cc-sel-bar" class="sel-bar no-print" hidden aria-live="polite" aria-atomic="true">
-        <span class="sel-bar-msg" id="cc-sel-msg"></span>
-        <span class="sel-bar-hint">Enter to set &mdash; Escape to cancel</span>
+  <div class="summary-card" role="region" aria-labelledby="sp-summary-heading">
+    <div class="summary-top">
+      <div>
+        <div class="summary-avg-label" id="sp-summary-heading">Overall average</div>
+        <div class="summary-avg" id="sp-avg-out" aria-label="Overall average score: 5.0 out of 10">5.0</div>
       </div>
-      <div class="table-scroll">
-        <table class="cal-table" role="grid"
-          aria-label="Weekly commitment calendar. Tab to enter, arrow keys to navigate, Shift and arrow keys to select a range."
-          id="cc-table">
-          <thead>
-            <tr>
-              <th scope="col">Time</th>
-              <th scope="col">Monday</th>
-              <th scope="col">Tuesday</th>
-              <th scope="col">Wednesday</th>
-              <th scope="col">Thursday</th>
-              <th scope="col">Friday</th>
-              <th scope="col">Saturday</th>
-              <th scope="col">Sunday</th>
-            </tr>
-          </thead>
-          <tbody id="cc-body"></tbody>
-        </table>
-      </div>
+      <button class="sp-reset-btn" onclick="spResetAll()" aria-label="Reset all domain scores to 5">Reset</button>
     </div>
+    <p class="summary-msg" id="sp-sum-msg" role="status" aria-live="polite">Adjust the sliders below to see your self-care profile.</p>
 
-  </div><!-- end page-row -->
-
-  <!-- Summary -->
-  <div class="summary-section" id="cc-summary-section"
-    role="region" aria-label="Weekly commitment summary"
-    aria-live="polite" aria-atomic="false">
+    <table class="scores-table" aria-label="Self-care domain ratings">
+      <thead>
+        <tr>
+          <th scope="col">Domain</th>
+          <th scope="col" class="th-slider">Rating (drag to adjust)</th>
+          <th scope="col" class="th-score">Score</th>
+        </tr>
+      </thead>
+      <tbody id="sp-scores-tbody"></tbody>
+    </table>
   </div>
-
-  <div id="cc-live" role="status" aria-live="polite" class="sr-only"></div>
-
 </div>
 
-<!-- Dialog -->
-<dialog id="cc-dialog" aria-labelledby="cc-dlg-title" aria-modal="true">
-  <div class="dialog-inner">
-    <h2 class="dialog-title" id="cc-dlg-title">Set Commitment</h2>
-    <p class="dialog-context" id="cc-dlg-ctx"></p>
-    <div class="dialog-field">
-      <label for="cc-sel">Category</label>
-      <select id="cc-sel" onchange="ccSelChange()"></select>
-    </div>
-    <div class="dialog-field" id="cc-custom-wrap" hidden>
-      <label for="cc-custom">Custom label</label>
-      <input type="text" id="cc-custom" maxlength="40" placeholder="Describe this commitment..."
-        onkeydown="if(event.key==='Enter'){event.preventDefault();ccDlgOk();}">
-    </div>
-    <div class="dialog-actions">
-      <button class="btn-danger" id="cc-dlg-clear" onclick="ccDlgClear()">Clear block</button>
-      <button class="btn btn-secondary btn-dlg" onclick="ccDlgCancel()">Cancel</button>
-      <button class="btn btn-primary btn-dlg" onclick="ccDlgOk()">OK</button>
-    </div>
-  </div>
-</dialog>
-
 <script>
-(function(){
+(function() {
+  var spDomains = [
+    { label: "Work (support & environment)", color: "#e97c61" },
+    { label: "Work (conditions)",            color: "#ee8959" },
+    { label: "Sleep",                        color: "#f4a261" },
+    { label: "Technology",                   color: "#efb366" },
+    { label: "Emotional / Psychological",    color: "#e9c46a" },
+    { label: "Support Networks",             color: "#8ab17d" },
+    { label: "Physical & Mental Health",     color: "#2a9d8f" },
+    { label: "Spirituality",                 color: "#287271" },
+    { label: "Leisure & Relaxation",         color: "#264653" },
+    { label: "Compassion & Kindness",        color: "#985277" },
+  ];
 
-/* ── CONSTANTS ── */
-var TIMES=[
-  '5 a.m.','6 a.m.','7 a.m.','8 a.m.','9 a.m.','10 a.m.','11 a.m.',
-  'Noon','1 p.m.','2 p.m.','3 p.m.','4 p.m.','5 p.m.','6 p.m.',
-  '7 p.m.','8 p.m.','9 p.m.','10 p.m.','11 p.m.','Midnight',
-  '1 a.m.','2 a.m.','3 a.m.','4 a.m.'
-];
-var DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  var N = spDomains.length;
+  var spValues = new Array(N).fill(5);
+  var tbody = document.getElementById('sp-scores-tbody');
 
-/* Color scheme:
-   border = provided hex (darker accent)
-   color  = light tint (15% color + 85% white) for backgrounds
-   All tints produce contrast ratios >10:1 with #1a1a1a text */
-var CATS=[
-  {value:'',        label:'\u2014 Select a category \u2014',color:'',       border:''},
-  {value:'class',   label:'Class',                  color:'#FEECDE',border:'#f58025'},
-  {value:'study',   label:'Study',                  color:'#D9E8F3',border:'#0064b1'},
-  {value:'sleep',   label:'Sleep',                  color:'#D9E1E8',border:'#003865'},
-  {value:'work',    label:'Work',                   color:'#DEF0F5',border:'#219ebc'},
-  {value:'exercise',label:'Exercise',               color:'#FAE9EE',border:'#e16f8f'},
-  {value:'meals',   label:'Meals',                  color:'#EEF5E9',border:'#90be6d'},
-  {value:'personal',label:'Personal Care',          color:'#F7FAE9',border:'#cce16f'},
-  {value:'social',  label:'Social / Downtime',      color:'#FFF8D9',border:'#ffcd00'},
-  {value:'meeting', label:'Organization / Meeting', color:'#FFF1D9',border:'#ffa300'},
-  {value:'custom',  label:'Custom\u2026',           color:'#EEF5F9',border:'#bdd6e6'}
-];
-
-/* ── DATA ── */
-var data=[];
-for(var t=0;t<TIMES.length;t++){data[t]=[];for(var d=0;d<DAYS.length;d++) data[t][d]=null;}
-
-/* ── STATE ── */
-var focusRow=0,focusCol=0;
-var selAnchor=null,selFocus=null;
-var isDragging=false,dragMoved=false,suppressClick=false;
-var dlgRange=null;
-
-/* ── SELECTION ── */
-function getRange(){
-  if(!selAnchor||!selFocus) return null;
-  return{r0:Math.min(selAnchor.row,selFocus.row),r1:Math.max(selAnchor.row,selFocus.row),
-         c0:Math.min(selAnchor.col,selFocus.col),c1:Math.max(selAnchor.col,selFocus.col)};
-}
-function inRange(r,c){var g=getRange();return g?r>=g.r0&&r<=g.r1&&c>=g.c0&&c<=g.c1:false;}
-function selCount(){var g=getRange();return g?(g.r1-g.r0+1)*(g.c1-g.c0+1):0;}
-function updateSelUI(){
-  document.querySelectorAll('.cal-btn').forEach(function(b){
-    b.classList.toggle('cc-sel',inRange(parseInt(b.dataset.row),parseInt(b.dataset.col)));
-  });
-  var count=selCount();
-  var bar=document.getElementById('cc-sel-bar');
-  var msg=document.getElementById('cc-sel-msg');
-  if(count>1){
-    var g=getRange();var h=g.r1-g.r0+1,dy=g.c1-g.c0+1;
-    bar.hidden=false;
-    msg.textContent=count+' cells selected \u2014 '+h+' hour'+(h!==1?'s':'')+' \u00d7 '+dy+' day'+(dy!==1?'s':'');
-  } else {bar.hidden=true;}
-}
-function clearSel(){selAnchor=null;selFocus=null;updateSelUI();}
-function deleteSel(){
-  var g=getRange();if(!g) return;
-  for(var r=g.r0;r<=g.r1;r++) for(var c=g.c0;c<=g.c1;c++){
-    data[r][c]=null;var b=getBtn(r,c);if(b) renderBtn(b,r,c);
+  function hexToRgb(hex) {
+    return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
   }
-  updateSummary();clearSel();
-}
 
-/* ── TABLE ── */
-function buildTable(){
-  var tbody=document.getElementById('cc-body');
-  tbody.innerHTML='';
-  TIMES.forEach(function(time,ti){
-    var tr=document.createElement('tr');
-    var th=document.createElement('th');
-    th.scope='row';th.className='time-cell';th.textContent=time;tr.appendChild(th);
-    DAYS.forEach(function(day,di){
-      var td=document.createElement('td');td.setAttribute('role','gridcell');
-      td.appendChild(makeBtn(ti,di));tr.appendChild(td);
-    });
+  function trackBg(color, pct) {
+    var rgb = hexToRgb(color);
+    var light = 'rgb('+Math.round(rgb[0]+(240-rgb[0])*0.7)+','+Math.round(rgb[1]+(240-rgb[1])*0.7)+','+Math.round(rgb[2]+(240-rgb[2])*0.7)+')';
+    return 'linear-gradient(to right,'+color+' 0%,'+color+' '+pct+'%,'+light+' '+pct+'%,'+light+' 100%)';
+  }
+
+  spDomains.forEach(function(d, i) {
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="td-name">'+d.label+'</td>'+
+      '<td class="td-slider">'+
+        '<input class="sp-styled-slider" type="range" id="sp-slider-'+i+'" min="1" max="10" step="1" value="5" data-i="'+i+'"'+
+        ' aria-label="'+d.label+' self-care rating"'+
+        ' aria-valuemin="1" aria-valuemax="10" aria-valuenow="5"'+
+        ' aria-valuetext="5 out of 10 \u2014 '+d.label+'"'+
+        ' style="--sp-thumb:'+d.color+';"'+
+        ' oninput="spOnSlide(this)">'+
+      '</td>'+
+      '<td class="td-score"><span id="sp-score-'+i+'" aria-label="'+d.label+': 5 out of 10">5<span style="font-size:10px;font-weight:400;color:#777;"> /10</span></span></td>';
     tbody.appendChild(tr);
+    document.getElementById('sp-slider-'+i).style.background = trackBg(d.color, 50);
   });
-  tbody.addEventListener('mousedown',function(e){
-    var btn=e.target.closest('.cal-btn');if(!btn) return;
-    var ti=parseInt(btn.dataset.row),di=parseInt(btn.dataset.col);
-    isDragging=true;dragMoved=false;
-    selAnchor={row:ti,col:di};selFocus={row:ti,col:di};
-    focusRow=ti;focusCol=di;syncTabIndex();updateSelUI();
-  });
-  tbody.addEventListener('mouseover',function(e){
-    if(!isDragging) return;
-    var btn=e.target.closest('.cal-btn');if(!btn) return;
-    var ti=parseInt(btn.dataset.row),di=parseInt(btn.dataset.col);
-    if(selFocus&&ti===selFocus.row&&di===selFocus.col) return;
-    dragMoved=true;selFocus={row:ti,col:di};updateSelUI();
-  });
-  tbody.addEventListener('dragstart',function(e){e.preventDefault();});
-  tbody.addEventListener('selectstart',function(e){if(isDragging)e.preventDefault();});
-}
-document.addEventListener('mouseup',function(){
-  if(!isDragging) return;
-  isDragging=false;
-  if(dragMoved){suppressClick=true;openDlgForSel();}
-  dragMoved=false;
-});
-function makeBtn(ti,di){
-  var btn=document.createElement('button');
-  btn.className='cal-btn empty';btn.dataset.row=ti;btn.dataset.col=di;
-  btn.tabIndex=(ti===0&&di===0)?0:-1;
-  btn.addEventListener('click',function(){
-    if(suppressClick){suppressClick=false;return;}
-    selAnchor={row:ti,col:di};selFocus={row:ti,col:di};updateSelUI();openDlgForSel();
-  });
-  btn.addEventListener('keydown',function(e){gridKey(e,ti,di);});
-  renderBtn(btn,ti,di);return btn;
-}
 
-/* ── RENDER ── */
-function getCat(v){for(var i=0;i<CATS.length;i++) if(CATS[i].value===v) return CATS[i];return null;}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function ariaLbl(ti,di){
-  var cell=data[ti][di],loc=DAYS[di]+', '+TIMES[ti];
-  if(!cell) return loc+' \u2014 Empty. Press Enter or Space to add.';
-  var cat=getCat(cell.category);
-  var cn=(cell.category==='custom')?'Custom':(cat?cat.label:cell.category);
-  return loc+' \u2014 '+cn+': '+cell.label+'. Press Enter to edit. Delete to clear.';
-}
-function renderBtn(btn,ti,di){
-  var cell=data[ti][di],sel=inRange(ti,di);
-  if(!cell){
-    btn.className='cal-btn empty'+(sel?' cc-sel':'');
-    btn.style.background='';btn.style.borderLeft='';
-    btn.innerHTML='<span class="cell-label" aria-hidden="true">+</span>';
-  } else {
-    var cat=getCat(cell.category);
-    var bg=cat?cat.color:'#F3F4F6',bdr=cat?cat.border:'#D1D5DB';
-    btn.className='cal-btn filled'+(sel?' cc-sel':'');
-    btn.style.background=bg;btn.style.borderLeft='3px solid '+bdr;
-    var catName=(cat&&cell.category!=='custom')?cat.label:'';
-    var html='<span class="cell-label">'+esc(cell.label)+'</span>';
-    if(catName&&catName!==cell.label)
-      html+='<span class="cell-cat" aria-hidden="true">'+esc(catName)+'</span>';
-    btn.innerHTML=html;
-  }
-  btn.setAttribute('aria-label',ariaLbl(ti,di));
-}
+  window.spOnSlide = function(el) {
+    var i = parseInt(el.dataset.i);
+    var v = parseInt(el.value);
+    var pct = (v - 1) / 9 * 100;
+    spValues[i] = v;
+    el.setAttribute('aria-valuenow', v);
+    el.setAttribute('aria-valuetext', v+' out of 10 \u2014 '+spDomains[i].label);
+    el.style.background = trackBg(spDomains[i].color, pct);
+    var sc = document.getElementById('sp-score-'+i);
+    sc.innerHTML = v+'<span style="font-size:10px;font-weight:400;color:#777;"> /10</span>';
+    sc.setAttribute('aria-label', spDomains[i].label+': '+v+' out of 10');
+    spUpdateSummary();
+  };
 
-/* ── TAB INDEX ── */
-function syncTabIndex(){
-  document.querySelectorAll('.cal-btn').forEach(function(b){
-    b.tabIndex=(parseInt(b.dataset.row)===focusRow&&parseInt(b.dataset.col)===focusCol)?0:-1;
-  });
-}
-function getBtn(r,c){return document.querySelector('.cal-btn[data-row="'+r+'"][data-col="'+c+'"]');}
-function moveFocus(r,c){
-  r=Math.max(0,Math.min(TIMES.length-1,r));c=Math.max(0,Math.min(DAYS.length-1,c));
-  focusRow=r;focusCol=c;syncTabIndex();var b=getBtn(r,c);if(b) b.focus();
-}
+  window.spUpdateSummary = function() {
+    var avg = spValues.reduce(function(a,b){return a+b;},0) / N;
+    var r = avg.toFixed(1);
+    var avgEl = document.getElementById('sp-avg-out');
+    avgEl.textContent = r;
+    avgEl.setAttribute('aria-label', 'Overall average score: '+r+' out of 10');
+    document.getElementById('sp-sum-msg').textContent = avg < 4
+      ? "Your ratings suggest you may be running low. Small, consistent steps make a real difference."
+      : avg < 7
+      ? "You are managing in several areas. Notice where your energy goes and where support might help."
+      : "Strong overall self-care. Keep nurturing the areas that sustain you.";
+  };
 
-/* ── KEYBOARD ── */
-function gridKey(e,ti,di){
-  var shift=e.shiftKey,nr=ti,nc=di;
-  var arrows=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End'];
-  if(arrows.indexOf(e.key)>-1){
-    e.preventDefault();
-    switch(e.key){
-      case 'ArrowUp':   nr=Math.max(0,ti-1);break;
-      case 'ArrowDown': nr=Math.min(TIMES.length-1,ti+1);break;
-      case 'ArrowLeft': nc=Math.max(0,di-1);break;
-      case 'ArrowRight':nc=Math.min(DAYS.length-1,di+1);break;
-      case 'Home':      nc=0;break;
-      case 'End':       nc=DAYS.length-1;break;
-    }
-    if(shift){
-      if(!selAnchor) selAnchor={row:ti,col:di};
-      selFocus={row:nr,col:nc};focusRow=nr;focusCol=nc;
-      syncTabIndex();var b=getBtn(nr,nc);if(b) b.focus();updateSelUI();
-    } else {clearSel();moveFocus(nr,nc);}
-    return;
-  }
-  switch(e.key){
-    case 'Enter':case ' ':
-      e.preventDefault();
-      if(!selAnchor){selAnchor={row:ti,col:di};selFocus={row:ti,col:di};}
-      openDlgForSel();break;
-    case 'Delete':case 'Backspace':
-      e.preventDefault();if(selAnchor) deleteSel();break;
-    case 'Escape':
-      if(selAnchor) clearSel();break;
-  }
-}
+  window.spResetAll = function() {
+    spValues.fill(5);
+    spDomains.forEach(function(d, i) {
+      var el = document.getElementById('sp-slider-'+i);
+      el.value = 5;
+      el.setAttribute('aria-valuenow', 5);
+      el.setAttribute('aria-valuetext', '5 out of 10 \u2014 '+d.label);
+      el.style.background = trackBg(d.color, 50);
+      var sc = document.getElementById('sp-score-'+i);
+      sc.innerHTML = '5<span style="font-size:10px;font-weight:400;color:#777;"> /10</span>';
+      sc.setAttribute('aria-label', d.label+': 5 out of 10');
+    });
+    spUpdateSummary();
+  };
 
-/* ── DIALOG ── */
-function openDlgForSel(){
-  var g=getRange();if(!g) return;dlgRange=g;
-  var count=(g.r1-g.r0+1)*(g.c1-g.c0+1),single=count===1;
-  document.getElementById('cc-dlg-title').textContent=single?'Set Commitment':'Set Commitment for '+count+' Cells';
-  var ctx=document.getElementById('cc-dlg-ctx');
-  if(single){ctx.textContent=DAYS[g.c0]+', '+TIMES[g.r0];}
-  else{
-    var dt=(g.c0===g.c1)?DAYS[g.c0]:(DAYS[g.c0]+' \u2013 '+DAYS[g.c1]);
-    var tt=(g.r0===g.r1)?TIMES[g.r0]:(TIMES[g.r0]+' \u2013 '+TIMES[g.r1]);
-    ctx.textContent=count+' cells: '+dt+', '+tt;
-  }
-  var sel=document.getElementById('cc-sel');
-  var custom=document.getElementById('cc-custom');
-  var customWrap=document.getElementById('cc-custom-wrap');
-  sel.innerHTML='';
-  CATS.forEach(function(c){var opt=document.createElement('option');opt.value=c.value;opt.textContent=c.label;sel.appendChild(opt);});
-  var existing=single?data[g.r0][g.c0]:null;
-  if(existing){sel.value=existing.category;custom.value=(existing.category==='custom')?existing.label:'';customWrap.hidden=(existing.category!=='custom');}
-  else{sel.value='';custom.value='';customWrap.hidden=true;}
-  var hasContent=false;
-  outer:for(var r=g.r0;r<=g.r1;r++) for(var c=g.c0;c<=g.c1;c++) if(data[r][c]){hasContent=true;break outer;}
-  document.getElementById('cc-dlg-clear').style.visibility=hasContent?'visible':'hidden';
-  document.getElementById('cc-dialog').showModal();sel.focus();
-}
-window.ccSelChange=function(){
-  var sel=document.getElementById('cc-sel'),wrap=document.getElementById('cc-custom-wrap');
-  wrap.hidden=(sel.value!=='custom');
-  if(sel.value==='custom') document.getElementById('cc-custom').focus();
-};
-window.ccDlgOk=function(){
-  var sel=document.getElementById('cc-sel'),custom=document.getElementById('cc-custom');
-  var cat=sel.value;if(!cat){sel.focus();return;}
-  var label;
-  if(cat==='custom'){label=custom.value.trim();if(!label){custom.focus();return;}}
-  else{var co=getCat(cat);label=co?co.label:cat;}
-  var g=dlgRange;
-  for(var r=g.r0;r<=g.r1;r++) for(var c=g.c0;c<=g.c1;c++){
-    data[r][c]={category:cat,label:label};var b=getBtn(r,c);if(b) renderBtn(b,r,c);
-  }
-  updateSummary();clearSel();closeDlg();
-};
-window.ccDlgClear=function(){
-  var g=dlgRange;
-  for(var r=g.r0;r<=g.r1;r++) for(var c=g.c0;c<=g.c1;c++){
-    data[r][c]=null;var b=getBtn(r,c);if(b) renderBtn(b,r,c);
-  }
-  updateSummary();clearSel();closeDlg();
-};
-window.ccDlgCancel=function(){closeDlg();};
-function closeDlg(){
-  document.getElementById('cc-dialog').close();
-  focusRow=dlgRange?dlgRange.r0:focusRow;focusCol=dlgRange?dlgRange.c0:focusCol;
-  syncTabIndex();var b=getBtn(focusRow,focusCol);if(b) b.focus();
-}
-var dlgEl=document.getElementById('cc-dialog');
-dlgEl.addEventListener('click',function(e){if(e.target===this)ccDlgCancel();});
-dlgEl.addEventListener('cancel',function(e){e.preventDefault();ccDlgCancel();});
-
-/* ── SUMMARY ── */
-function buildSummarySection(){
-  var section=document.getElementById('cc-summary-section');section.innerHTML='';
-  var h2=document.createElement('h2');h2.className='summary-heading';
-  h2.textContent='Weekly Commitment Summary';section.appendChild(h2);
-  var grid=document.createElement('div');grid.className='sum-cat-grid';
-  CATS.slice(1).forEach(function(cat){
-    var card=document.createElement('div');
-    card.className='sum-cat-card';
-    card.style.background=cat.color||'#f3f4f6';
-    card.style.borderLeftColor=cat.border||'#ccc';
-    var name=document.createElement('div');name.className='sum-cat-name';
-    name.textContent=(cat.label==='Custom\u2026')?'Custom':cat.label;
-    var hours=document.createElement('div');hours.className='sum-cat-hours';
-    hours.id='sum-'+cat.value;hours.textContent='0';
-    var lbl=document.createElement('div');lbl.className='sum-cat-label';
-    lbl.setAttribute('aria-hidden','true');lbl.textContent='hours this week';
-    card.appendChild(name);card.appendChild(hours);card.appendChild(lbl);
-    grid.appendChild(card);
-  });
-  section.appendChild(grid);
-  var studyRow=document.createElement('div');studyRow.className='sum-study-row';
-  [{id:'cc-study-sched',noteId:'',label:'Hours scheduled for study',val:'0',note:''},
-   {id:'cc-study-needed',noteId:'cc-study-note',label:'Hours needed for study',val:'0\u20130',note:'Based on 0 class hours'}
-  ].forEach(function(item){
-    var card=document.createElement('div');card.className='sum-study-card';
-    var lbl=document.createElement('div');lbl.className='sum-study-name';lbl.textContent=item.label;
-    var val=document.createElement('div');val.className='sum-study-val';val.id=item.id;val.textContent=item.val;
-    card.appendChild(lbl);card.appendChild(val);
-    if(item.note){
-      var note=document.createElement('div');note.className='sum-study-note';
-      note.id=item.noteId;note.textContent=item.note;card.appendChild(note);
-    }
-    studyRow.appendChild(card);
-  });
-  section.appendChild(studyRow);
-}
-function updateSummary(){
-  var counts={};CATS.slice(1).forEach(function(c){counts[c.value]=0;});
-  for(var t=0;t<TIMES.length;t++) for(var d=0;d<DAYS.length;d++)
-    if(data[t][d]&&counts.hasOwnProperty(data[t][d].category)) counts[data[t][d].category]++;
-  CATS.slice(1).forEach(function(c){var el=document.getElementById('sum-'+c.value);if(el) el.textContent=counts[c.value]||0;});
-  var study=counts['study']||0,cls=counts['class']||0;
-  var minN=cls*2,maxN=cls*3;
-  var se=document.getElementById('cc-study-sched');
-  var ne=document.getElementById('cc-study-needed');
-  var no=document.getElementById('cc-study-note');
-  if(se) se.textContent=study;
-  if(ne) ne.textContent=minN+'\u2013'+maxN;
-  if(no) no.textContent='Based on '+cls+' class hour'+(cls!==1?'s':'');
-  var live=document.getElementById('cc-live');
-  if(live) live.textContent='Study scheduled: '+study+'. Needed: '+minN+' to '+maxN+'.';
-}
-
-/* ── CLEAR ALL ── */
-window.ccClearAll=function(){
-  if(!confirm('Clear all commitments from the calendar?')) return;
-  for(var t=0;t<TIMES.length;t++) for(var d=0;d<DAYS.length;d++) data[t][d]=null;
-  document.querySelectorAll('.cal-btn').forEach(function(b){
-    renderBtn(b,parseInt(b.dataset.row),parseInt(b.dataset.col));
-  });
-  clearSel();updateSummary();
-};
-
-/* ── INIT ── */
-buildTable();buildSummarySection();updateSummary();syncTabIndex();
-
+  spUpdateSummary();
 })();
 </script>
+
 </body>
 </html>
